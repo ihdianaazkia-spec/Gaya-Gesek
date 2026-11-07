@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif Gaya Gesek - Sains SD</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Google: Comic Neue & Poppins untuk tampilan ramah anak & rapi -->
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Poppins:wght@400;600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 100%);
+            min-height: 100vh;
+        }
+        .font-comic {
+            font-family: 'Comic Neue', cursive;
+        }
+        .font-signature {
+            font-family: 'Great Vibes', cursive;
+        }
+        
+        /* Custom Animation */
+        @keyframes bounce-subtle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        .animate-bounce-subtle {
+            animation: bounce-subtle 2s infinite ease-in-out;
+        }
+
+        /* Certificate Print Styling */
+        @media print {
+            body {
+                background: white !important;
+                padding: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            #certificate-section {
+                display: block !important;
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 100vw;
+                height: 100vh;
+                margin: 0;
+                padding: 20px;
+                box-sizing: border-box;
+                background: white;
+                box-shadow: none !important;
+                border: 8px solid #0284c7 !important;
+            }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4 sm:p-6 md:p-8">
+
+    <div class="w-full max-w-3xl bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl border-4 border-sky-300 p-6 sm:p-8 relative overflow-hidden">
+        
+        <!-- ================= 1. LAYAR LOGIN / IDENTITAS ================= -->
+        <div id="screen-login" class="space-y-6 text-center">
+            <div class="inline-block bg-amber-100 text-amber-800 text-sm font-semibold px-4 py-1.5 rounded-full border border-amber-300 shadow-sm animate-bounce-subtle">
+                🔬 Media Pembelajaran Sains SD Kelas 4-6
+            </div>
+            
+            <div class="space-y-2">
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-sky-800 font-comic tracking-wide">
+                    ⚡ KUIS INTERAKTIF GAYA GESEK ⚡
+                </h1>
+                <p class="text-gray-600 text-sm sm:text-base">
+                    Uji pemahamanmu dengan 5 soal pilihan ganda! Setiap jawaban langsung ada penjelasannya.
+                </p>
+            </div>
+
+            <!-- Kartu Ilustrasi Singkat -->
+            <div class="grid grid-cols-3 gap-3 my-4 max-w-md mx-auto">
+                <div class="p-3 bg-sky-50 rounded-2xl border border-sky-200 text-center">
+                    <div class="text-2xl mb-1">🚲</div>
+                    <div class="text-xs font-semibold text-sky-900">Rem Sepeda</div>
+                </div>
+                <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-center">
+                    <div class="text-2xl mb-1">👟</div>
+                    <div class="text-xs font-semibold text-amber-900">Sol Sepatu</div>
+                </div>
+                <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-center">
+                    <div class="text-2xl mb-1">🛞</div>
+                    <div class="text-xs font-semibold text-emerald-900">Alur Ban</div>
+                </div>
+            </div>
+
+            <!-- Form Identitas -->
+            <form id="form-identity" onsubmit="startQuiz(event)" class="space-y-4 max-w-md mx-auto text-left">
+                <div>
+                    <label for="student-name" class="block text-sm font-bold text-gray-700 mb-1">Nama Lengkap Siswa <span class="text-red-500">*</span></label>
+                    <input type="text" id="student-name" required placeholder="Contoh: Budi Santoso"
+                        class="w-full px-4 py-3 rounded-xl border-2 border-sky-200 focus:border-sky-500 focus:ring-4 focus:ring-sky-100 outline-none transition text-gray-800 font-medium">
+                </div>
+                
+                <div>
+                    <label for="student-absen" class="block text-sm font-bold text-gray-700 mb-1">Nomor Absen <span class="text-red-500">*</span></label>
+                    <input type="number" id="student-absen" required min="1" max="50" placeholder="Contoh: 12"
+                        class="w-full px-4 py-3 rounded-xl border-2 border-sky-200 focus:border-sky-500 focus:ring-4 focus:ring-sky-100 outline-none transition text-gray-800 font-medium">
+                </div>
+
+                <button type="submit" 
+                    class="w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 transition duration-150 text-lg">
+                    🚀 Mulai Kuis Sekarang
+                </button>
+            </form>
+        </div>
+
+
+        <!-- ================= 2. LAYAR KUIS ================= -->
+        <div id="screen-quiz" class="hidden space-y-6">
+            <!-- Header Status Quiz -->
+            <div class="flex flex-wrap justify-between items-center pb-4 border-b border-sky-100 gap-2">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-sky-600">Peserta Kuis</span>
+                    <h3 id="display-identity" class="text-base sm:text-lg font-bold text-gray-800">Nama (Absen)</h3>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs font-bold uppercase tracking-wider text-sky-600">Soal Ke</span>
+                    <div id="display-question-number" class="text-base sm:text-lg font-bold text-sky-700">1 dari 5</div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden border border-gray-200">
+                <div id="progress-bar" class="bg-gradient-to-r from-sky-400 to-blue-600 h-3 rounded-full transition-all duration-300" style="width: 20%;"></div>
+            </div>
+
+            <!-- Pertanyaan -->
+            <div class="bg-sky-50/70 p-5 sm:p-6 rounded-2xl border border-sky-200">
+                <span id="question-category" class="inline-block px-3 py-1 bg-sky-200 text-sky-800 text-xs font-bold rounded-lg mb-3">Kategori Soal</span>
+                <h2 id="question-text" class="text-lg sm:text-xl font-bold text-gray-800 leading-relaxed">
+                    Teks pertanyaan kuis akan dimuat di sini...
+                </h2>
+            </div>
+
+            <!-- Pilihan Jawaban (A, B, C, D) -->
+            <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <!-- Diisi via JS -->
+            </div>
+
+            <!-- Kotak Penjelasan Langsung (Umpan Balik) -->
+            <div id="feedback-box" class="hidden p-4 rounded-2xl border-2 transition-all duration-300 space-y-2">
+                <div id="feedback-header" class="font-bold text-base flex items-center gap-2"></div>
+                <p id="feedback-explanation" class="text-sm leading-relaxed text-gray-700"></p>
+            </div>
+
+            <!-- Tombol Navigasi Next -->
+            <div class="flex justify-end pt-2">
+                <button id="btn-next" onclick="nextQuestion()" disabled
+                    class="bg-gray-300 text-gray-500 font-bold py-3 px-8 rounded-xl cursor-not-allowed transition duration-200 shadow">
+                    Lanjut ➔
+                </button>
+            </div>
+        </div>
+
+
+        <!-- ================= 3. LAYAR HASIL & SERTIFIKAT ================= -->
+        <div id="screen-result" class="hidden space-y-6">
+            <!-- Header Ringkasan Skor -->
+            <div class="text-center space-y-2 no-print">
+                <div class="inline-block p-3 bg-sky-100 text-sky-700 rounded-full text-3xl mb-1">🏆</div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-sky-900 font-comic">Selamat! Kamu Telah Menyelesaikan Kuis</h2>
+                <p class="text-gray-600">Berikut adalah hasil evaluasi belajar materi Gaya Gesek kamu:</p>
+            </div>
+
+            <!-- Ringkasan Nilai Card -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center no-print">
+                <div class="bg-blue-50 p-3 rounded-2xl border border-blue-200">
+                    <div class="text-xs text-blue-600 font-semibold">Skor Akhir</div>
+                    <div id="res-score" class="text-2xl font-black text-blue-800">0</div>
+                </div>
+                <div class="bg-emerald-50 p-3 rounded-2xl border border-emerald-200">
+                    <div class="text-xs text-emerald-600 font-semibold">Jawaban Benar</div>
+                    <div id="res-correct" class="text-2xl font-black text-emerald-800">0 / 5</div>
+                </div>
+                <div class="bg-amber-50 p-3 rounded-2xl border border-amber-200">
+                    <div class="text-xs text-amber-600 font-semibold">Persentase</div>
+                    <div id="res-percent" class="text-2xl font-black text-amber-800">0%</div>
+                </div>
+                <div class="bg-purple-50 p-3 rounded-2xl border border-purple-200">
+                    <div class="text-xs text-purple-600 font-semibold">Predikat</div>
+                    <div id="res-predicate" class="text-lg font-extrabold text-purple-800 truncate">Baik</div>
+                </div>
+            </div>
+
+            <!-- ================= KOMPONEN SERTIFIKAT DIGITAL ================= -->
+            <div id="certificate-section" class="bg-white p-6 sm:p-8 rounded-2xl border-8 border-double border-sky-600 shadow-xl relative overflow-hidden my-4">
+                <!-- Pattern Hiasan Sudut Sertifikat -->
+                <div class="absolute top-0 left-0 w-16 h-16 border-t-8 border-l-8 border-amber-400"></div>
+                <div class="absolute top-0 right-0 w-16 h-16 border-t-8 border-r-8 border-amber-400"></div>
+                <div class="absolute bottom-0 left-0 w-16 h-16 border-b-8 border-l-8 border-amber-400"></div>
+                <div class="absolute bottom-0 right-0 w-16 h-16 border-b-8 border-r-8 border-amber-400"></div>
+
+                <div class="text-center space-y-4">
+                    <!-- Header Sertifikat -->
+                    <div class="space-y-1">
+                        <div class="text-sky-600 font-bold text-xs uppercase tracking-widest">Sertifikat Kelulusan Evaluasi Sains SD</div>
+                        <h2 class="text-3xl sm:text-4xl font-extrabold text-amber-600 font-comic tracking-wider">SERTIFIKAT PENGHARGAAN</h2>
+                        <p class="text-xs text-gray-500 italic">Diberikan sebagai apresiasi atas pemahaman materi IPA "Gaya Gesek"</p>
+                    </div>
+
+                    <div class="w-24 h-1 bg-amber-400 mx-auto rounded-full"></div>
+
+                    <!-- Penerima -->
+                    <div class="space-y-1 py-2">
+                        <p class="text-sm text-gray-600">Sertifikat ini secara resmi diberikan kepada:</p>
+                        <h3 id="cert-name" class="text-2xl sm:text-3xl font-extrabold text-sky-900 border-b-2 border-sky-200 inline-block px-8 py-1">
+                            Nama Siswa
+                        </h3>
+                        <p id="cert-absen" class="text-sm font-semibold text-gray-700">Nomor Absen: -</p>
+                    </div>
+
+                    <!-- Deskripsi Nilai -->
+                    <p class="text-xs sm:text-sm text-gray-600 max-w-lg mx-auto leading-relaxed">
+                        Telah berhasil menyelesaikan <b>Kuis Interaktif Gaya Gesek (5 Soal)</b> pada tanggal <span id="cert-date" class="font-semibold text-gray-800"></span> dengan pencapaian nilai 
+                        <span id="cert-score" class="font-bold text-sky-700">100/100</span> dan memperoleh predikat 
+                        <span id="cert-predicate" class="font-bold text-amber-600">Sangat Memuaskan</span>.
+                    </p>
+
+                    <!-- Stempel & Tanda Tangan Virtual -->
+                    <div class="grid grid-cols-2 gap-4 pt-6 mt-4 border-t border-gray-100 items-end">
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-16 h-16 bg-amber-100 border-2 border-dashed border-amber-500 rounded-full text-amber-700 font-bold text-xs transform -rotate-12">
+                                LULUS<br>IPA SD
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-1">Stempel Digital Pembelajaran</p>
+                        </div>
+                        <div class="text-center space-y-1">
+                            <div class="font-signature text-3xl text-sky-800">Guru Sains</div>
+                            <div class="border-t border-gray-400 w-32 mx-auto"></div>
+                            <p class="text-xs font-bold text-gray-700">Guru Pengajar IPA</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tombol Aksi Result (No Print) -->
+            <div class="flex flex-col sm:flex-row gap-3 justify-center pt-2 no-print">
+                <button onclick="printCertificate()" 
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
+                    🖨️ Cetak / Simpan Sertifikat
+                </button>
+                <button onclick="resetQuiz()" 
+                    class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
+                    🔄 Ulangi Kuis
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script Logika Aplikasi & Audio Synth -->
+    <script>
+        // ================= BANK SOAL GAYA GESEK (5 SOAL SD) =================
+        const quizQuestions = [
+            {
+                category: "Pengertian Gaya Gesek",
+                question: "Gaya gesek terjadi ketika dua permukaan benda saling...",
+                options: [
+                    "A. Berjauhan dan tidak bersentuhan",
+                    "B. Bersentuhan dan saling bergesekan",
+                    "C. Melayang di udara bebas",
+                    "D. Bermagnet satu sama lain"
+                ],
+                answer: 1,
+                explanation: "Gaya gesek adalah gaya yang muncul akibat adanya dua permukaan benda yang saling bersentuhan dan bergesekan. Arah gaya gesek selalu berlawanan dengan arah gerak benda."
+            },
+            {
+                category: "Sifat Permukaan",
+                question: "Mengapa kelereng bergerak lebih cepat dan jauh saat menggelinding di atas lantai keramik yang licin daripada di atas rumput?",
+                options: [
+                    "A. Keramik memiliki gaya gesek yang lebih kecil",
+                    "B. Rumput memiliki gaya gesek yang lebih kecil",
+                    "C. Keramik membuat kelereng menjadi lebih berat",
+                    "D. Rumput mendorong kelereng ke belakang"
+                ],
+                answer: 0,
+                explanation: "Semakin halus permukaan suatu benda (seperti keramik), maka gaya geseknya akan semakin kecil sehingga benda dapat meluncur/menggelinding lebih cepat."
+            },
+            {
+                category: "Manfaat Gaya Gesek",
+                question: "Mengapa sol sepatu sekolah dibuat berulir atau mempunyai garis-garis alur yang kasar?",
+                options: [
+                    "A. Supaya sepatu terlihat indah saja",
+                    "B. Memperbesar gaya gesek agar kita tidak mudah terpeleset",
+                    "C. Memperkecil gaya gesek agar bisa cepat berlari",
+                    "D. Agar sepatu tidak cepat kotor"
+                ],
+                answer: 1,
+                explanation: "Alur kasar pada sol sepatu berguna untuk memperbesar gaya gesek antara sepatu dengan lantai atau jalan, sehingga kaki mencengkeram permukaan dan kita tidak mudah terpeleset."
+            },
+            {
+                category: "Memperkecil Gaya Gesek",
+                question: "Rantai sepeda yang kaku dan berdecit dapat diatasi dengan memberikan minyak pelumas atau oli. Tujuan pemberian oli ini adalah...",
+                options: [
+                    "A. Memperbesar gaya gesek pada rantai",
+                    "B. Memperkecil gaya gesek agar rantai berputar lancar",
+                    "C. Menambah berat rantai sepeda",
+                    "D. Menghentikan laju roda sepeda"
+                ],
+                answer: 1,
+                explanation: "Pelumas (oli) membuat permukaan besi pada rantai menjadi lebih licin. Hal ini mengurangi/memperkecil gaya gesek sehingga rantai sepeda berputar dengan lancar dan tidak berdecit."
+            },
+            {
+                category: "Kerugian Gaya Gesek",
+                question: "Manakah di bawah ini contoh dampak dari gaya gesek yang merugikan?",
+                options: [
+                    "A. Kita dapat memegang pensil tanpa terlepas",
+                    "B. Ban sepeda menjadi aus dan tipis setelah lama dipakai",
+                    "C. Korek api kayu dapat menyala saat digesek",
+                    "D. Sepeda dapat berhenti saat rem ditarik"
+                ],
+                answer: 1,
+                explanation: "Gaya gesek yang terus-menerus antara ban dan jalan menyebabkan permukaan ban mengikis sehingga ban menjadi aus (tipis/gundul). Ini merupakan salah satu kerugian gaya gesek."
+            }
+        ];
+
+        // ================= STATE APLIKASI =================
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedAnswers = [];
+        let studentData = { name: '', absen: '' };
+
+        // ================= AUDIO SYNTHESIS (Web Audio API) =================
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'select') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.08);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } else if (type === 'correct') {
+                // Sound efek sukses / benar
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'wrong') {
+                // Sound efek salah
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(260, now);
+                osc.frequency.setValueAtTime(190, now + 0.15); 
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            }
+        }
+
+        // ================= LOGIKA INTERAKSI =================
+
+        function startQuiz(e) {
+            e.preventDefault();
+            const nameInput = document.getElementById('student-name').value.trim();
+            const absenInput = document.getElementById('student-absen').value.trim();
+
+            if (!nameInput || !absenInput) return;
+
+            studentData.name = nameInput;
+            studentData.absen = absenInput;
+
+            document.getElementById('display-identity').innerText = `${studentData.name} (Absen: ${studentData.absen})`;
+            
+            // Pindah Layar
+            document.getElementById('screen-login').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.remove('hidden');
+
+            // Reset Variable
+            currentQuestionIndex = 0;
+            score = 0;
+            selectedAnswers = new Array(quizQuestions.length).fill(null);
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = quizQuestions[currentQuestionIndex];
+            
+            // Status Soal & Progress
+            document.getElementById('display-question-number').innerText = `${currentQuestionIndex + 1} dari ${quizQuestions.length}`;
+            const progressPercent = ((currentQuestionIndex + 1) / quizQuestions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+
+            // Teks Pertanyaan
+            document.getElementById('question-category').innerText = q.category;
+            document.getElementById('question-text').innerText = q.question;
+
+            // Sembunyikan Kotak Feedback Penjelasan
+            const feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.classList.add('hidden');
+
+            // Container Opsi
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            const btnNext = document.getElementById('btn-next');
+            btnNext.disabled = selectedAnswers[currentQuestionIndex] === null;
+            if (btnNext.disabled) {
+                btnNext.className = "bg-gray-300 text-gray-500 font-bold py-3 px-8 rounded-xl cursor-not-allowed transition duration-200 shadow";
+            } else {
+                btnNext.className = "bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-8 rounded-xl cursor-pointer transition duration-200 shadow-md";
+            }
+
+            const currentSelected = selectedAnswers[currentQuestionIndex];
+
+            // Render 4 Tombol Pilihan
+            q.options.forEach((optText, index) => {
+                const isSelected = currentSelected === index;
+                const isCorrect = index === q.answer;
+                
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                
+                // Jika sudah dijawab, kunci tombol tidak bisa diklik lagi
+                if (currentSelected !== null) {
+                    btn.disabled = true;
+                } else {
+                    btn.onclick = () => selectOption(index);
+                }
+                
+                let optionStyle = 'bg-white border-gray-200 text-gray-700 hover:border-sky-300 hover:bg-sky-50/50';
+                let iconText = '';
+                let iconClass = 'border-gray-300';
+
+                if (currentSelected !== null) {
+                    if (isCorrect) {
+                        optionStyle = 'bg-emerald-100 border-emerald-500 text-emerald-900 font-semibold ring-2 ring-emerald-300';
+                        iconText = '✓';
+                        iconClass = 'border-emerald-600 bg-emerald-600 text-white text-xs';
+                    } else if (isSelected && !isCorrect) {
+                        optionStyle = 'bg-rose-100 border-rose-500 text-rose-900 font-semibold ring-2 ring-rose-300';
+                        iconText = '✕';
+                        iconClass = 'border-rose-600 bg-rose-600 text-white text-xs';
+                    } else {
+                        optionStyle = 'bg-gray-50 border-gray-200 text-gray-400 opacity-60';
+                    }
+                }
+
+                btn.className = `w-full text-left p-4 rounded-xl border-2 transition-all duration-200 font-medium flex items-center justify-between ${optionStyle}`;
+
+                btn.innerHTML = `
+                    <span class="pr-2">${optText}</span>
+                    <span class="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${iconClass}">
+                        ${iconText}
+                    </span>
+                `;
+                container.appendChild(btn);
+            });
+
+            // Tampilkan penjelasan jika sudah ada pilihan
+            if (currentSelected !== null) {
+                showExplanation(currentSelected);
+            }
+        }
+
+        function selectOption(index) {
+            selectedAnswers[currentQuestionIndex] = index;
+            const q = quizQuestions[currentQuestionIndex];
+            const isCorrect = index === q.answer;
+
+            if (isCorrect) {
+                playSound('correct');
+            } else {
+                playSound('wrong');
+            }
+
+            // Aktifkan Tombol Lanjut
+            const btnNext = document.getElementById('btn-next');
+            btnNext.disabled = false;
+            btnNext.className = "bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-8 rounded-xl cursor-pointer transition duration-200 shadow-md transform hover:scale-105";
+
+            renderQuestion();
+        }
+
+        function showExplanation(selectedIndex) {
+            const q = quizQuestions[currentQuestionIndex];
+            const isCorrect = selectedIndex === q.answer;
+            const feedbackBox = document.getElementById('feedback-box');
+            const feedbackHeader = document.getElementById('feedback-header');
+            const feedbackExplanation = document.getElementById('feedback-explanation');
+
+            feedbackBox.classList.remove('hidden');
+
+            if (isCorrect) {
+                feedbackBox.className = "p-4 rounded-2xl border-2 bg-emerald-50 border-emerald-300 text-emerald-900 transition-all duration-300 space-y-1.5";
+                feedbackHeader.innerHTML = `<span class="text-xl">🎉</span> Jawaban Kamu Benar!`;
+            } else {
+                feedbackBox.className = "p-4 rounded-2xl border-2 bg-rose-50 border-rose-300 text-rose-900 transition-all duration-300 space-y-1.5";
+                feedbackHeader.innerHTML = `<span class="text-xl">💡</span> Jawaban Kurang Tepat!`;
+            }
+
+            feedbackExplanation.innerHTML = `<b>Penjelasan:</b> ${q.explanation}`;
+        }
+
+        function nextQuestion() {
+            if (selectedAnswers[currentQuestionIndex] === null) return;
+            playSound('select');
+
+            if (currentQuestionIndex < quizQuestions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                calculateResult();
+            }
+        }
+
+        function calculateResult() {
+            let correctCount = 0;
+            selectedAnswers.forEach((ans, idx) => {
+                if (ans === quizQuestions[idx].answer) {
+                    correctCount++;
+                }
+            });
+
+            const totalScore = (correctCount / quizQuestions.length) * 100;
+            const percentage = totalScore;
+
+            // Tentukan Predikat
+            let predicate = "";
+            if (percentage >= 100) predicate = "Sempurna! 🏆";
+            else if (percentage >= 80) predicate = "Sangat Memuaskan 🌟";
+            else if (percentage >= 60) predicate = "Baik 👍";
+            else predicate = "Perlu Belajar Lagi 📚";
+
+            // Tanggal Sekarang
+            const today = new Date().toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            // Update UI Ringkasan Hasil
+            document.getElementById('res-score').innerText = totalScore;
+            document.getElementById('res-correct').innerText = `${correctCount} / ${quizQuestions.length}`;
+            document.getElementById('res-percent').innerText = `${percentage}%`;
+            document.getElementById('res-predicate').innerText = predicate;
+
+            // Update Isi Sertifikat
+            document.getElementById('cert-name').innerText = studentData.name;
+            document.getElementById('cert-absen').innerText = `Nomor Absen: ${studentData.absen}`;
+            document.getElementById('cert-date').innerText = today;
+            document.getElementById('cert-score').innerText = `${totalScore} / 100`;
+            document.getElementById('cert-predicate').innerText = predicate;
+
+            // Tampilkan Layar Hasil
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
+        }
+
+        function resetQuiz() {
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('screen-login').classList.remove('hidden');
+            document.getElementById('form-identity').reset();
+        }
+
+        function printCertificate() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
